@@ -1,19 +1,37 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { authAPI } from '../../api/authAPI';
 
+export interface UserProfile {
+  id: number;
+  email: string;
+  name: string;
+  fullName: string;
+  role: string;
+  bio: string;
+  avatar: string;
+  phone: string;
+  location: string;
+  joinDate: string;
+  lastLogin: string;
+}
+
 export interface AuthState {
   user: any | null;
+  profile: UserProfile | null;
   token: string | null;
   isAuthenticated: boolean;
   loading: boolean;
+  profileLoading: boolean;
   error: string | null;
 }
 
 const initialState: AuthState = {
   user: null,
+  profile: null,
   token: localStorage.getItem('token'),
   isAuthenticated: !!localStorage.getItem('token'),
   loading: false,
+  profileLoading: false,
   error: null,
 };
 
@@ -38,6 +56,18 @@ export const logoutUser = createAsyncThunk(
       return null;
     } catch (error: any) {
       return rejectWithValue('Logout failed');
+    }
+  }
+);
+
+export const fetchUserProfile = createAsyncThunk(
+  'auth/fetchProfile',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await authAPI.getUserProfile();
+      return response;
+    } catch (error: any) {
+      return rejectWithValue(error.message || 'Failed to fetch profile');
     }
   }
 );
@@ -68,8 +98,21 @@ const authSlice = createSlice({
       })
       .addCase(logoutUser.fulfilled, (state) => {
         state.user = null;
+        state.profile = null;
         state.token = null;
         state.isAuthenticated = false;
+      })
+      .addCase(fetchUserProfile.pending, (state) => {
+        state.profileLoading = true;
+        state.error = null;
+      })
+      .addCase(fetchUserProfile.fulfilled, (state, action) => {
+        state.profileLoading = false;
+        state.profile = action.payload;
+      })
+      .addCase(fetchUserProfile.rejected, (state, action) => {
+        state.profileLoading = false;
+        state.error = action.payload as string;
       });
   },
 });
