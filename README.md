@@ -21,26 +21,6 @@ A responsive, interactive frontend for a User Profile Management system built wi
 - **Formik + Yup** for form handling and validation
 - **Axios** for API calls (mock implementation)
 
-## 📁 Project Structure
-
-```
-src/
-├── api/
-│   └── authAPI.ts          # Mock authentication API
-├── components/
-│   └── ProtectedRoute.tsx  # Route protection component
-├── pages/
-│   ├── LoginPage.tsx       # Login form with validation
-│   └── DashboardPage.tsx   # User dashboard
-├── redux/
-│   ├── store.ts           # Redux store configuration
-│   ├── hooks.ts           # Custom Redux hooks
-│   └── slices/
-│       └── authSlice.ts   # Authentication state management
-├── App.tsx                # Main application component
-└── index.tsx              # Application entry point
-```
-
 ## 🚀 Getting Started
 
 ### Prerequisites
@@ -109,25 +89,5 @@ The application includes mock user data for testing:
 - `npm run build` - Builds the app for production
 - `npm run eject` - Ejects from Create React App
 
-## 🎨 Customization
 
-### Theme Configuration
-The Material UI theme can be customized in `src/App.tsx`:
-
-```typescript
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#1976d2',
-    },
-    secondary: {
-      main: '#dc004e',
-    },
-  },
-  // Add more theme customizations here
-});
-```
-
-### API Configuration
-The mock API can be replaced with a real backend by updating `src/api/authAPI.ts`.
 
