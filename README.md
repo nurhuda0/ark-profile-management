@@ -2,6 +2,9 @@
 
 A responsive, interactive frontend for a User Profile Management system built with React, TypeScript, and modern web technologies.
 
+![alt text](image.png)
+![alt text](localhost_3000_dashboard.png)
+
 ## 🚀 Features
 
 - **Authentication System**: Secure login with email and password, complete with validation using Formik and Yup.
