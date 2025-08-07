@@ -121,4 +121,48 @@ export const authAPI = {
       lastLogin: user.lastLogin,
     };
   },
+
+  updateUserProfile: async (profileData: {
+    fullName: string;
+    email: string;
+    bio: string;
+    avatar: string;
+  }) => {
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    const token = localStorage.getItem('token');
+    if (!token) {
+      throw new Error('No token found');
+    }
+
+    const userIdMatch = token.match(/mock-jwt-token-user-(\d+)/);
+    const userId = userIdMatch ? parseInt(userIdMatch[1]) : 1;
+    const userIndex = mockUsers.findIndex(u => u.id === userId);
+
+    if (userIndex === -1) {
+      throw new Error('User not found');
+    }
+
+    const updatedUser = {
+      ...mockUsers[userIndex],
+      ...profileData,
+    };
+
+    mockUsers[userIndex] = updatedUser;
+
+    return {
+      user: {
+        id: updatedUser.id,
+        email: updatedUser.email,
+        name: updatedUser.name,
+        fullName: updatedUser.fullName,
+        role: updatedUser.role,
+        bio: updatedUser.bio,
+        avatar: updatedUser.avatar,
+        phone: updatedUser.phone,
+        location: updatedUser.location,
+        joinDate: updatedUser.joinDate,
+        lastLogin: updatedUser.lastLogin,
+      },
+    };
+  },
 }; 

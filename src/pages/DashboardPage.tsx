@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -13,6 +13,10 @@ import {
   Chip,
   Skeleton,
   Alert,
+  Modal,
+  TextField,
+  Snackbar,
+  IconButton,
 } from '@mui/material';
 import {
   LogoutOutlined,
@@ -23,9 +27,22 @@ import {
   CalendarToday,
   AccessTime,
   Edit,
+  PhotoCamera,
 } from '@mui/icons-material';
-import { logoutUser, fetchUserProfile } from '../redux/slices/authSlice';
+import { logoutUser, fetchUserProfile, updateUserProfile } from '../redux/slices/authSlice';
 import { RootState, AppDispatch } from '../redux/store';
+
+const modalStyle = {
+  position: 'absolute' as 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 400,
+  bgcolor: 'background.paper',
+  border: '2px solid #000',
+  boxShadow: 24,
+  p: 4,
+};
 
 const DashboardPage: React.FC = () => {
   const navigate = useNavigate();
@@ -33,6 +50,14 @@ const DashboardPage: React.FC = () => {
   const { user, profile, isAuthenticated, profileLoading, error } = useSelector(
     (state: RootState) => state.auth
   );
+  const [isEditModalOpen, setEditModalOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    fullName: '',
+    email: '',
+    bio: '',
+    avatar: '',
+  });
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -43,12 +68,51 @@ const DashboardPage: React.FC = () => {
     }
   }, [dispatch, isAuthenticated, navigate]);
 
+  useEffect(() => {
+    if (profile) {
+      setFormData({
+        fullName: profile.fullName || '',
+        email: profile.email || '',
+        bio: profile.bio || '',
+        avatar: profile.avatar || '',
+      });
+    }
+  }, [profile]);
+
   const handleLogout = async () => {
     try {
       await dispatch(logoutUser()).unwrap();
       navigate('/login');
     } catch (error) {
       console.error('Logout failed:', error);
+    }
+  };
+
+  const handleOpenEditModal = () => setEditModalOpen(true);
+  const handleCloseEditModal = () => setEditModalOpen(false);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setFormData({ ...formData, avatar: event.target?.result as string });
+      };
+      reader.readAsDataURL(e.target.files[0]);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await dispatch(updateUserProfile(formData)).unwrap();
+      setSuccessMessage('Profile updated successfully!');
+      handleCloseEditModal();
+    } catch (err) {
+      console.error('Failed to update profile:', err);
     }
   };
 
@@ -143,6 +207,7 @@ const DashboardPage: React.FC = () => {
                 startIcon={<Edit />}
                 size="small"
                 sx={{ mt: 1 }}
+                onClick={handleOpenEditModal}
               >
                 Edit Profile
               </Button>
@@ -259,8 +324,75 @@ const DashboardPage: React.FC = () => {
           features like dark mode toggle, responsive design, and real-time data synchronization.
         </Typography>
       </Paper>
+
+      <Modal
+        open={isEditModalOpen}
+        onClose={handleCloseEditModal}
+        aria-labelledby="edit-profile-modal-title"
+      >
+        <Box sx={modalStyle} component="form" onSubmit={handleSubmit}>
+          <Typography id="edit-profile-modal-title" variant="h6" component="h2">
+            Edit Profile
+          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, my: 2 }}>
+            <Avatar src={formData.avatar} sx={{ width: 80, height: 80 }} />
+            <IconButton color="primary" aria-label="upload picture" component="label">
+              <input hidden accept="image/*" type="file" onChange={handleAvatarChange} />
+              <PhotoCamera />
+            </IconButton>
+          </Box>
+          <TextField
+            label="Full Name"
+            name="fullName"
+            value={formData.fullName}
+            onChange={handleChange}
+            fullWidth
+            required
+            sx={{ mb: 2 }}
+          />
+          <TextField
+            label="Email"
+            name="email"
+            type="email"
+            value={formData.email}
+            onChange={handleChange}
+            fullWidth
+            required
+            sx={{ mb: 2 }}
+          />
+          <TextField
+            label="Bio"
+            name="bio"
+            value={formData.bio}
+            onChange={handleChange}
+            multiline
+            rows={4}
+            fullWidth
+            sx={{ mb: 2 }}
+          />
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
+            <Button onClick={handleCloseEditModal} color="secondary">
+              Cancel
+            </Button>
+            <Button type="submit" variant="contained" disabled={profileLoading}>
+              {profileLoading ? 'Saving...' : 'Save Changes'}
+            </Button>
+          </Box>
+        </Box>
+      </Modal>
+
+      <Snackbar
+        open={!!successMessage}
+        autoHideDuration={6000}
+        onClose={() => setSuccessMessage(null)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert onClose={() => setSuccessMessage(null)} severity="success" sx={{ width: '100%' }}>
+          {successMessage}
+        </Alert>
+      </Snackbar>
     </Container>
   );
 };
 
-export default DashboardPage; 
+export default DashboardPage;
