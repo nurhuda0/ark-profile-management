@@ -18,13 +18,13 @@ const mockUsers = [
   },
   {
     id: 2,
-    email: 'user@example.com',
+    email: 'jane@example.com',
     password: 'user123',
     name: 'Regular User',
     role: 'user',
-    fullName: 'Sarah Johnson',
-    bio: 'Creative professional with expertise in design and user experience. Always looking for ways to improve digital products and make them more user-friendly.',
-    avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face',
+    fullName: 'Jane Doe',
+    bio: 'Frontend dev from Manila',
+    avatar: 'https://i.pravatar.cc/150?img=3',
     phone: '+1 (555) 987-6543',
     location: 'New York, NY',
     joinDate: '2023-03-22',
@@ -53,7 +53,7 @@ export const authAPI = {
         name: user.name,
         role: user.role,
       },
-      token: `mock-jwt-token-${user.id}-${Date.now()}`,
+      token: `mock-jwt-token-user-${user.id}-${Date.now()}`,
     };
   },
   
@@ -73,7 +73,8 @@ export const authAPI = {
     }
     
     // Mock user data based on token
-    const userId = token.includes('1') ? 1 : 2;
+    const userIdMatch = token.match(/mock-jwt-token-user-(\d+)/);
+    const userId = userIdMatch ? parseInt(userIdMatch[1]) : 1;
     const user = mockUsers.find(u => u.id === userId);
     
     if (!user) {
@@ -98,7 +99,8 @@ export const authAPI = {
     }
     
     // Mock user data based on token
-    const userId = token.includes('1') ? 1 : 2;
+    const userIdMatch = token.match(/mock-jwt-token-user-(\d+)/);
+    const userId = userIdMatch ? parseInt(userIdMatch[1]) : 1;
     const user = mockUsers.find(u => u.id === userId);
     
     if (!user) {

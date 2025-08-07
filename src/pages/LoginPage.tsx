@@ -229,7 +229,7 @@ const LoginPage: React.FC = () => {
                 Admin: admin@example.com / admin123
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                User: user@example.com / user123
+                User: jane@example.com / user123
               </Typography>
             </Popover>
           </Paper>
