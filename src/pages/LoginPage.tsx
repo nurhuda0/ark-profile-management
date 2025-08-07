@@ -12,8 +12,10 @@ import {
   Box,
   Alert,
   CircularProgress,
+  IconButton,
+  Popover,
 } from '@mui/material';
-import { LockOutlined } from '@mui/icons-material';
+import { LockOutlined, HelpOutline } from '@mui/icons-material';
 import { loginUser, clearError } from '../redux/slices/authSlice';
 import { RootState, AppDispatch } from '../redux/store';
 import { getRandomCityBackground } from '../utils/backgroundImages';
@@ -35,6 +37,17 @@ const LoginPage: React.FC = () => {
   );
 
   const [background] = useState(getRandomCityBackground());
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+
+  const handleHelpClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleHelpClose = () => {
+    setAnchorEl(null);
+  };
+
+  const open = Boolean(anchorEl);
 
   useEffect(() => {
     // Clear any existing errors when component mounts
@@ -176,7 +189,40 @@ const LoginPage: React.FC = () => {
             </Formik>
 
             <Box sx={{ mt: 2, textAlign: 'center' }}>
-              <Typography variant="body2" color="text.secondary">
+                <IconButton
+                    onClick={handleHelpClick}
+                    sx={{
+                      color: 'text.secondary',
+                      '&:hover': {
+                        color: 'primary.main',
+                      },
+                    }}
+                  >
+                    <HelpOutline />
+                  </IconButton>
+                </Box>
+
+                <Popover
+                  open={open}
+                  anchorEl={anchorEl}
+                  onClose={handleHelpClose}
+                  anchorOrigin={{
+                    vertical: 'top',
+                    horizontal: 'center',
+                  }}
+                  transformOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'center',
+                  }}
+                  sx={{
+                    '& .MuiPopover-paper': {
+                      p: 2,
+                      borderRadius: 2,
+                      boxShadow: 3,
+                    },
+                  }}
+                >
+              <Typography variant="body2" color="text.secondary" gutterBottom>
                 Demo Credentials:
               </Typography>
               <Typography variant="body2" color="text.secondary">
@@ -185,7 +231,7 @@ const LoginPage: React.FC = () => {
               <Typography variant="body2" color="text.secondary">
                 User: user@example.com / user123
               </Typography>
-            </Box>
+            </Popover>
           </Paper>
         </Box>
       </Container>
