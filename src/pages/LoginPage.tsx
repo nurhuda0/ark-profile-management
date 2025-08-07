@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { Formik, Form, Field } from 'formik';
@@ -16,6 +16,7 @@ import {
 import { LockOutlined } from '@mui/icons-material';
 import { loginUser, clearError } from '../redux/slices/authSlice';
 import { RootState, AppDispatch } from '../redux/store';
+import { getRandomCityBackground } from '../utils/backgroundImages';
 
 const validationSchema = Yup.object({
   email: Yup.string()
@@ -32,6 +33,8 @@ const LoginPage: React.FC = () => {
   const { loading, error, isAuthenticated } = useSelector(
     (state: RootState) => state.auth
   );
+
+  const [background] = useState(getRandomCityBackground());
 
   useEffect(() => {
     // Clear any existing errors when component mounts
@@ -54,127 +57,140 @@ const LoginPage: React.FC = () => {
   };
 
   return (
-    <Container component="main" maxWidth="xs">
-      <Box
-        sx={{
-          marginTop: 8,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-        }}
-      >
-        <Paper
-          elevation={3}
+    <Box
+      sx={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(${background.url})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+      }}
+    >
+      <Container component="main" maxWidth="xs">
+        <Box
           sx={{
-            padding: 4,
+            marginTop: 8,
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            width: '100%',
           }}
         >
-          <Box
+          <Paper
+            elevation={3}
             sx={{
-              backgroundColor: 'primary.main',
-              borderRadius: '50%',
-              width: 56,
-              height: 56,
+              padding: 4,
               display: 'flex',
+              flexDirection: 'column',
               alignItems: 'center',
-              justifyContent: 'center',
-              marginBottom: 2,
+              width: '100%',
             }}
           >
-            <LockOutlined sx={{ color: 'white' }} />
-          </Box>
-          
-          <Typography component="h1" variant="h5" gutterBottom>
-            Sign In
-          </Typography>
-          
-          <Typography variant="body2" color="text.secondary" align="center" sx={{ mb: 3 }}>
-            Enter your credentials to access your account
-          </Typography>
+            <Box
+              sx={{
+                backgroundColor: 'primary.main',
+                borderRadius: '50%',
+                width: 56,
+                height: 56,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginBottom: 2,
+              }}
+            >
+              <LockOutlined sx={{ color: 'white' }} />
+            </Box>
+            
+            <Typography component="h1" variant="h5" gutterBottom>
+              Sign In
+            </Typography>
+            
+            <Typography variant="body2" color="text.secondary" align="center" sx={{ mb: 3 }}>
+              Enter your credentials to access your account
+            </Typography>
 
-          {error && (
-            <Alert severity="error" sx={{ width: '100%', mb: 2 }}>
-              {error}
-            </Alert>
-          )}
-
-          <Formik
-            initialValues={{ email: '', password: '' }}
-            validationSchema={validationSchema}
-            onSubmit={handleSubmit}
-          >
-            {({ values, errors, touched, handleChange, handleBlur }) => (
-              <Form style={{ width: '100%' }}>
-                <Field
-                  as={TextField}
-                  margin="normal"
-                  fullWidth
-                  id="email"
-                  label="Email Address"
-                  name="email"
-                  autoComplete="email"
-                  autoFocus
-                  value={values.email}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  error={touched.email && Boolean(errors.email)}
-                  helperText={touched.email && errors.email}
-                  disabled={loading}
-                />
-                
-                <Field
-                  as={TextField}
-                  margin="normal"
-                  fullWidth
-                  name="password"
-                  label="Password"
-                  type="password"
-                  id="password"
-                  autoComplete="current-password"
-                  value={values.password}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  error={touched.password && Boolean(errors.password)}
-                  helperText={touched.password && errors.password}
-                  disabled={loading}
-                />
-                
-                <Button
-                  type="submit"
-                  fullWidth
-                  variant="contained"
-                  sx={{ mt: 3, mb: 2, height: 48 }}
-                  disabled={loading}
-                >
-                  {loading ? (
-                    <CircularProgress size={24} color="inherit" />
-                  ) : (
-                    'Sign In'
-                  )}
-                </Button>
-              </Form>
+            {error && (
+              <Alert severity="error" sx={{ width: '100%', mb: 2 }}>
+                {error}
+              </Alert>
             )}
-          </Formik>
 
-          <Box sx={{ mt: 2, textAlign: 'center' }}>
-            <Typography variant="body2" color="text.secondary">
-              Demo Credentials:
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Admin: admin@example.com / admin123
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              User: user@example.com / user123
-            </Typography>
-          </Box>
-        </Paper>
-      </Box>
-    </Container>
+            <Formik
+              initialValues={{ email: '', password: '' }}
+              validationSchema={validationSchema}
+              onSubmit={handleSubmit}
+            >
+              {({ values, errors, touched, handleChange, handleBlur }) => (
+                <Form style={{ width: '100%' }}>
+                  <Field
+                    as={TextField}
+                    margin="normal"
+                    fullWidth
+                    id="email"
+                    label="Email Address"
+                    name="email"
+                    autoComplete="email"
+                    autoFocus
+                    value={values.email}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    error={touched.email && Boolean(errors.email)}
+                    helperText={touched.email && errors.email}
+                    disabled={loading}
+                  />
+                  
+                  <Field
+                    as={TextField}
+                    margin="normal"
+                    fullWidth
+                    name="password"
+                    label="Password"
+                    type="password"
+                    id="password"
+                    autoComplete="current-password"
+                    value={values.password}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    error={touched.password && Boolean(errors.password)}
+                    helperText={touched.password && errors.password}
+                    disabled={loading}
+                  />
+                  
+                  <Button
+                    type="submit"
+                    fullWidth
+                    variant="contained"
+                    sx={{ mt: 3, mb: 2, height: 48 }}
+                    disabled={loading}
+                  >
+                    {loading ? (
+                      <CircularProgress size={24} color="inherit" />
+                    ) : (
+                      'Sign In'
+                    )}
+                  </Button>
+                </Form>
+              )}
+            </Formik>
+
+            <Box sx={{ mt: 2, textAlign: 'center' }}>
+              <Typography variant="body2" color="text.secondary">
+                Demo Credentials:
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Admin: admin@example.com / admin123
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                User: user@example.com / user123
+              </Typography>
+            </Box>
+          </Paper>
+        </Box>
+      </Container>
+    </Box>
   );
 };
 
-export default LoginPage; 
+export default LoginPage;
